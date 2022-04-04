@@ -1,0 +1,21 @@
+from queue import deque
+import math
+
+def solution(progresses, speeds):
+    answer = deque()
+    for p,s in zip(progresses, speeds):
+        answer.append(math.ceil((100-p)/s))
+        
+    min=0
+    temp=[]
+    
+    while(answer):
+        now=answer.popleft()
+        if min<now:
+            temp.append([now])
+            min=now
+        else :
+            temp[-1].append(now)
+            
+    return [len(x) for x in temp]
+solution([95, 90, 99, 99, 80, 99],[1, 1, 1, 1, 1, 1])
