@@ -1,0 +1,25 @@
+# from itertools import product
+
+def trans(n):
+    rev_base = ''
+    while n > 0:
+        n, mod = divmod(n, 3)
+        if mod==0:
+            n-=1
+            mod=4
+        rev_base += str(mod)
+
+    return rev_base[::-1]
+
+def solution(n):
+    # line=[1]
+    # for i in range(1,19):
+    #     temp=3**i
+    #     line.append(temp+line[-1])
+#     line=	[1, 4, 13, 40, 121, 364, 1093, 3280, 9841, 29524, 88573, 265720, 797161, 2391484, 7174453, 21523360, 64570081, 193710244, 500000001]
+    
+#     for i in range(18):
+#         if  n<line[i+1]:
+#             return ''.join(list(product(['1','2','4'],repeat=i+1))[n-line[i]])
+
+    return trans(n)
