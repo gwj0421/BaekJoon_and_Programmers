@@ -26,7 +26,7 @@ def isRight(temp):
 def solution(p):
     # func_1
     if not p:
-        return ""
+        return ''
     
     # func_2
     u,v=func_2(p)
