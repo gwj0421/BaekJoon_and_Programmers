@@ -1,7 +1,5 @@
 def solution(s, n):
     answer = ''
-    highList=[chr(x) for x in range(65,91)]
-    lowList=[chr(x) for x in range(97,123)]
     
     for i in s:
         if i.isalpha():
