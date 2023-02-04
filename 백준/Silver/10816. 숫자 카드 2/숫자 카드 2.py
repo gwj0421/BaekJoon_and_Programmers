@@ -1,5 +1,5 @@
 import sys
-
+from collections import Counter
 
 def solution():
     input = sys.stdin.readline
@@ -8,11 +8,8 @@ def solution():
     m = int(input().rstrip('\n'))
     questions = list(map(int, input().split()))
 
-    cnt = {x: 0 for x in list(set(numCards))}
+    cnt = Counter(numCards)
     ans = []
-    for i in numCards:
-        cnt[i] += 1
-
     for q in questions:
         if cnt.get(q):
             ans.append(cnt.get(q))
