@@ -1,10 +1,10 @@
-# [Silver III] 랜선 자르기 - 1654 
+# [Silver II] 랜선 자르기 - 1654 
 
 [문제 링크](https://www.acmicpc.net/problem/1654) 
 
 ### 성능 요약
 
-메모리: 29452 KB, 시간: 528 ms
+메모리: 31256 KB, 시간: 84 ms
 
 ### 분류
 
