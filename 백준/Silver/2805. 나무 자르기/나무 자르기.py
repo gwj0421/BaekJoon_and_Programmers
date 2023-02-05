@@ -1,17 +1,32 @@
-n,m=map(int,input().split())
-treelen=list(map(int,input().split()))
-remaintree=[0 for i in range(n)]
-low=1
-high=max(treelen)
+import sys
 
-while low<=high:
-    mid=(low+high)//2
-    treeleft=0
-    for i in range(n):
-        if mid<treelen[i]:
-            treeleft+=treelen[i]-mid
-    if treeleft>=m:
-        low=mid+1
-    else:
-        high=mid-1
-print(high)
+
+def slicingTree(parm):
+    sliced = 0
+    for tree in trees:
+        if parm < tree:
+            sliced += tree - parm
+    return sliced
+
+
+def paramSearch(start, end, target):
+    ans = -1
+    while start <= end:
+        mid = (start + end) // 2
+        if slicingTree(mid) >= target:
+            ans = mid
+            start = mid + 1
+        else:
+            end = mid - 1
+    print(ans)
+
+
+def solution():
+    global trees
+    input = sys.stdin.readline
+    n, m = map(int, input().split())
+    trees = list(map(int, input().split()))
+    paramSearch(0, 2000000000, m)
+
+
+solution()
