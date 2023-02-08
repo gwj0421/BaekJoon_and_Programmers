@@ -1,4 +1,4 @@
-# [Bronze II] 알파벳 찾기 - 10809 
+# [Bronze V] 알파벳 찾기 - 10809 
 
 [문제 링크](https://www.acmicpc.net/problem/10809) 
 
