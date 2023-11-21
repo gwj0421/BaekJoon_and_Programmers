@@ -1,19 +1,22 @@
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
 
 class Solution {
     public int solution(int[] people, int limit) {
-        int ans = 0;
+        int answer = 0;
         Arrays.sort(people);
-        int start = 0;
-        int end = people.length - 1;
-
-        while (start <= end) {
-            if (people[start] + people[end] <= limit) {
-                start++;
-            }
-            end--;
-            ans++;
+        Deque<Integer> deque = new LinkedList<>();
+        for (int i = 0; i < people.length; i++) {
+            deque.add(people[i]);
         }
-        return ans;
+        
+        while (!deque.isEmpty()) {
+            answer++;
+            int h = deque.pollLast();
+            if (!deque.isEmpty() && h + deque.peekFirst() <= limit)
+                deque.pollFirst();
+        }
+        return answer;
     }
 }
