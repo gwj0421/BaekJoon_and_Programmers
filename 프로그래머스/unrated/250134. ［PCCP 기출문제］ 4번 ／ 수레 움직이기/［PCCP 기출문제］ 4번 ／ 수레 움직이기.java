@@ -5,10 +5,10 @@ import java.util.Queue;
 class Solution {
     private static final int[] CONTROL_Y = {0, 0, 1, -1};
     private static final int[] CONTROL_X = {1, -1, 0, 0};
-    private int row, col;
+    private int row;
+    private int col;
 
     class Wagon {
-        private final int moveCnt = 0;
         private final int[] pos;
         private final int[] end;
         private final int[][] board;
@@ -17,10 +17,6 @@ class Solution {
             this.pos = pos;
             this.end = end;
             this.board = board;
-        }
-
-        public int getMoveCnt() {
-            return moveCnt;
         }
 
         public int[] getPos() {
@@ -55,24 +51,9 @@ class Solution {
         public boolean isEnd() {
             return getPos()[0] == getEnd()[0] && getPos()[1] == getEnd()[1];
         }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("pos: ").append(Arrays.toString(pos)).append("\n");
-            sb.append("end: ").append(Arrays.toString(end)).append("\n");
-            sb.append("board:\n");
-
-            for (int[] row : board) {
-                sb.append(Arrays.toString(row)).append("\n");
-            }
-
-            return sb.toString();
-        }
     }
 
     public int solution(int[][] maze) {
-        int answer = 0;
         row = maze.length;
         col = maze[0].length;
         int[] rStart = new int[2];
@@ -107,73 +88,69 @@ class Solution {
             Wagon blue = now[1];
             if (red.isEnd()) {
                 if (blue.isEnd()) {
-//                    System.out.println(1);
-//                    System.out.println(red);
-//                    System.out.println(blue);
-                    return Math.max(red.getBoard()[rEnd[0]][rEnd[1]]-1, blue.getBoard()[bEnd[0]][bEnd[1]]-1);
+                    return Math.max(red.getBoard()[rEnd[0]][rEnd[1]] - 1, blue.getBoard()[bEnd[0]][bEnd[1]] - 1);
                 } else {
-//                    System.out.println(2);
-//                    System.out.println(red);
-//                    System.out.println(blue);
-                    for (int i = 0; i < 4; i++) {
-                        int[] bNextPos = blue.getNext(i);
-                        if (isIn(bNextPos) && canMove(blue.getBoard(),maze, bNextPos) && !isDuplicated(bNextPos, red.getPos())) {
-                            needVisited.add(new Wagon[]{red, blue.move(bNextPos)});
-                        }
-                    }
+                    moveOnlyBlue(red, blue, maze, needVisited);
                 }
 
             } else {
                 if (blue.isEnd()) {
-//                    System.out.println(3);
-//                    System.out.println(red);
-//                    System.out.println(blue);
-                    for (int i = 0; i < 4; i++) {
-                        int[] rNextPos = red.getNext(i);
-                        if (isIn(rNextPos) && canMove(red.getBoard(),maze, rNextPos) && !isDuplicated(rNextPos, blue.getPos())) {
-                            needVisited.add(new Wagon[]{red.move(rNextPos), blue});
-                        }
-                    }
+                    moveOnlyRed(red, blue, maze, needVisited);
                 } else {
-//                    System.out.println(4);
-//                    System.out.println(red);
-//                    System.out.println(blue);
-                    for (int i = 0; i < 4; i++) {
-                        int[] rNextPos = red.getNext(i);
-                        if (isIn(rNextPos) && canMove(red.getBoard(),maze, rNextPos) && !isDuplicated(rNextPos, blue.getPos())) {
-                            for (int j = 0; j < 4; j++) {
-                                int[] bNextPos = blue.getNext(j);
-                                if (isIn(bNextPos) && canMove(blue.getBoard(),maze, bNextPos) && !isDuplicated(bNextPos, rNextPos)) {
-                                    needVisited.add(new Wagon[]{red.move(rNextPos), blue.move(bNextPos)});
-                                }
-                            }
-                        }
-                    }
+                    moveBoth(red, blue, maze, needVisited);
+                }
+            }
+        }
+        return 0;
+    }
 
-                    for (int i = 0; i < 4; i++) {
-                        int[] bNextPos = blue.getNext(i);
-                        if (isIn(bNextPos) && canMove(blue.getBoard(),maze, bNextPos) && !isDuplicated(bNextPos, red.getPos())) {
-                            for (int j = 0; j < 4; j++) {
-                                int[] rNextPos = red.getNext(j);
-                                if (isIn(rNextPos) && canMove(red.getBoard(),maze, rNextPos) && !isDuplicated(rNextPos, bNextPos)) {
-                                    needVisited.add(new Wagon[]{red.move(rNextPos), blue.move(bNextPos)});
-                                }
-                            }
+    private void moveOnlyRed(Wagon red, Wagon blue, int[][] maze, Queue<Wagon[]> needVisited) {
+        for (int i = 0; i < 4; i++) {
+            int[] rNextPos = red.getNext(i);
+            if (isIn(rNextPos) && canMove(red.getBoard(), maze, rNextPos) && !isDuplicated(rNextPos, blue.getPos())) {
+                needVisited.add(new Wagon[]{red.move(rNextPos), blue});
+            }
+        }
+    }
+
+    private void moveOnlyBlue(Wagon red, Wagon blue, int[][] maze, Queue<Wagon[]> needVisited) {
+        for (int i = 0; i < 4; i++) {
+            int[] bNextPos = blue.getNext(i);
+            if (isIn(bNextPos) && canMove(blue.getBoard(), maze, bNextPos) && !isDuplicated(bNextPos, red.getPos())) {
+                needVisited.add(new Wagon[]{red, blue.move(bNextPos)});
+            }
+        }
+    }
+
+    private void moveBoth(Wagon red, Wagon blue, int[][] maze, Queue<Wagon[]> needVisited) {
+        moveOneByOne(red, blue, maze, needVisited, true);
+        moveOneByOne(blue, red, maze, needVisited, false);
+    }
+
+    private void moveOneByOne(Wagon first, Wagon second, int[][] maze, Queue<Wagon[]> needVisited, boolean isNaturalOrder) {
+        for (int i = 0; i < 4; i++) {
+            int[] firstNextPos = first.getNext(i);
+            if (isIn(firstNextPos) && canMove(first.getBoard(), maze, firstNextPos) && !isDuplicated(firstNextPos, second.getPos())) {
+                for (int j = 0; j < 4; j++) {
+                    int[] secondNextPos = second.getNext(j);
+                    if (isIn(secondNextPos) && canMove(second.getBoard(), maze, secondNextPos) && !isDuplicated(secondNextPos, firstNextPos)) {
+                        if (isNaturalOrder) {
+                            needVisited.add(new Wagon[]{first.move(firstNextPos), second.move(secondNextPos)});
+                        } else {
+                            needVisited.add(new Wagon[]{second.move(secondNextPos), first.move(firstNextPos)});
                         }
+
                     }
                 }
             }
-
-
         }
-        return 0;
     }
 
     private boolean isIn(int[] pos) {
         return -1 < pos[0] && pos[0] < row && -1 < pos[1] && pos[1] < col;
     }
 
-    private boolean canMove(int[][] board,int[][] maze, int[] pos) {
+    private boolean canMove(int[][] board, int[][] maze, int[] pos) {
         return board[pos[0]][pos[1]] == 0 && maze[pos[0]][pos[1]] != 5;
     }
 
