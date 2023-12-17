@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -30,10 +29,14 @@ public class Main {
         });
 
         int rank = 1;
+        if (countries.get(0)[0] == k) {
+            System.out.println(1);
+            return;
+        }
         for (int i = 1; i < n; i++) {
             if (!isSameRecord(countries.get(i - 1), countries.get(i))) {
-                rank++;
-            }
+                rank = i+1;
+            } 
             if (countries.get(i)[0] == k) {
                 System.out.println(rank);
                 return;
