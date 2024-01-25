@@ -1,16 +1,14 @@
 class Solution {
     fun solution(arr: IntArray, divisor: Int): IntArray {
-        val answer = arrayListOf<Int>()
-
-        for (num in arr) {
-            if (num % divisor == 0) {
-                answer.add(num)
-            }
-        }
-        if (answer.isEmpty()) {
-            return intArrayOf(-1)
-        }
+        var answer = intArrayOf()
+        arr.forEach {
+            if (it % divisor == 0) {
+                answer += it
+            } }
         answer.sort()
-        return answer.toIntArray()
+        if (answer.isEmpty()) {
+            answer += -1
+        }
+        return answer
     }
 }
