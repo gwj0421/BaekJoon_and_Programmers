@@ -15,13 +15,16 @@ public class Main {
             return;
         }
         int[] score = new int[31];
+        int total = 0;
         for (int i = 0; i < n; i++) {
-            score[Integer.parseInt(br.readLine())]++;
+            int judgeScore = Integer.parseInt(br.readLine());
+            score[judgeScore]++;
+            total += judgeScore;
         }
-        showTrimmedAverage(n, score);
+        showTrimmedAverage(n, score,total);
     }
 
-    public static void showTrimmedAverage(int n, int[] score) {
+    public static void showTrimmedAverage(int n, int[] score, int total) {
         int dropCnt = Math.round(n * 0.15F);
 
         int leftIdx = 0;
@@ -29,6 +32,7 @@ public class Main {
         while (leftDropCnt < dropCnt) {
             if (score[leftIdx] > 0) {
                 score[leftIdx]--;
+                total -= leftIdx;
                 leftDropCnt++;
             } else {
                 leftIdx++;
@@ -40,21 +44,14 @@ public class Main {
         while (rightDropCnt < dropCnt) {
             if (score[rightIdx] > 0) {
                 score[rightIdx]--;
+                total -= rightIdx;
                 rightDropCnt++;
             } else {
                 rightIdx--;
             }
         }
 
-        int sum = 0;
-        int cnt = 0;
-        for (int i = 1; i < score.length; i++) {
-            if (score[i] > 0) {
-                sum += i * score[i];
-                cnt += score[i];
-            }
-        }
-        System.out.println(Math.round((float) sum/ cnt));
+        System.out.println(Math.round((float) total/ (n - 2 * dropCnt)));
 
     }
 
