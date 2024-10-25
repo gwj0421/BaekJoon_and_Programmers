@@ -1,9 +1,7 @@
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -14,121 +12,119 @@ public class Main {
         StringTokenizer st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken());
         int q = Integer.parseInt(st.nextToken());
-        Page page = new Page(n);
+
+        HomePage homePage = new HomePage();
         for (int i = 0; i < q; i++) {
-            page.control(br.readLine());
+            homePage.control(br.readLine());
         }
-        // now 2
-        // before 1 1 2 1 1
-        // after
-        page.printResult();
+        homePage.print();
     }
 
-    static class Page {
-        private final int websiteCnt;
-        private Deque<Integer> before;
-        private int now;
-        private Stack<Integer> after;
+    static class HomePage {
+        private int idx = -1;
+        private Page backPage = null;
+        private Page frontPage = null;
 
-        public Page(int websiteCnt) {
-            this.websiteCnt = websiteCnt;
-            this.before = new ArrayDeque<>();
-            this.now = 0;
-            this.after = new Stack<>();
-        }
-
-        public void setBefore(Deque<Integer> before) {
-            this.before = before;
-        }
-
-        public void setNow(int now) {
-            this.now = now;
-        }
-
-        private void clearBefore() {
-            this.before.clear();
-        }
-
-        private void clearAfter() {
-            this.after.clear();
-        }
-
-        public void control(String query) {
+        void control(String query) {
             if (query.charAt(0) == 'B') {
-                back();
+                goBack();
             } else if (query.charAt(0) == 'F') {
-                front();
-            } else if (query.charAt(0) == 'A') {
-                access(Integer.parseInt(query.split(" ")[1]));
+                goFront();
             } else if (query.charAt(0) == 'C') {
                 compress();
             } else {
-                throw new IllegalArgumentException();
+                access(Integer.parseInt(query.split(" ")[1]));
             }
         }
 
-        private void back() {
-            if (before.isEmpty()) {
+        void goBack() {
+            if (backPage == null) {
                 return;
             }
-            after.add(now);
-            setNow(before.pollLast());
+
+            if (frontPage != null && frontPage.now == idx) {
+                frontPage.cnt++;
+            } else {
+                frontPage = new Page(idx, frontPage);
+            }
+            idx = backPage.now;
+            if (--backPage.cnt == 0) {
+                backPage = backPage.nextPage;
+            }
         }
 
-        private void front() {
-            if (after.isEmpty()) {
+        void goFront() {
+            if (frontPage == null) {
                 return;
             }
-            before.addLast(now);
-            setNow(after.pop());
+            if (backPage != null && backPage.now == idx) {
+                backPage.cnt++;
+            } else {
+                backPage = new Page(idx, backPage);
+            }
+            idx = frontPage.now;
+            if (--frontPage.cnt == 0) {
+                frontPage = frontPage.nextPage;
+            }
         }
 
-        private void access(int i) {
-            clearAfter();
-            if (now != 0) {
-                before.addLast(now);
-            }
-            setNow(i);
-        }
+        void access(int i) {
+            frontPage = null;
+            if (idx != -1) {
+                if (backPage != null && backPage.now == idx) {
+                    backPage.cnt++;
 
-        private void compress() {
-            if (before.isEmpty()) {
-                return;
-            }
-            Deque<Integer> temp = new ArrayDeque<>();
-            while (!before.isEmpty()) {
-                int top = before.pollLast();
-                if (temp.isEmpty() || temp.peekFirst() != top) {
-                    temp.addFirst(top);
+                } else {
+                    backPage = new Page(idx, backPage);
                 }
             }
-
-            setBefore(temp);
+            idx = i;
         }
 
-        void printResult() {
-            StringBuilder sb;
-            System.out.println(now);
-            if (before.isEmpty()) {
+        void compress() {
+            Page tempPage = backPage;
+            while (tempPage != null) {
+                tempPage.cnt = 1;
+                tempPage = tempPage.nextPage;
+            }
+        }
+
+        void print() {
+            System.out.println(idx);
+            if (backPage == null) {
                 System.out.println(-1);
             } else {
-                sb = new StringBuilder();
-                while (!before.isEmpty()) {
-                    sb.append(before.pollLast()).append(" ");
-                }
-                System.out.println(sb);
+                backPage.printPage();
             }
-
-            if (after.isEmpty()) {
+            if (frontPage == null) {
                 System.out.println(-1);
             } else {
-                sb = new StringBuilder();
-                while (!after.isEmpty()) {
-                    sb.append(after.pop()).append(" ");
-                }
-                System.out.println(sb);
+                frontPage.printPage();
             }
         }
 
     }
+
+    static class Page {
+        private int now;
+        private int cnt;
+        private Page nextPage;
+
+        public Page(int now, Page nextPage) {
+            this.now = now;
+            this.cnt = 1;
+            this.nextPage = nextPage;
+        }
+
+        public void printPage() {
+            StringBuilder sb = new StringBuilder();
+            Page tempPage = this;
+            while (tempPage != null) {
+                sb.append((tempPage.now + " ").repeat(tempPage.cnt));
+                tempPage = tempPage.nextPage;
+            }
+            System.out.println(sb);
+        }
+    }
+
 }
