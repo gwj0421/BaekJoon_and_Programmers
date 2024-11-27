@@ -19,10 +19,9 @@ public class Main {
         List<Long> menus = Arrays.stream(br.readLine().split(" ")).map(Long::parseLong).sorted().collect(Collectors.toList());
         long ans = 0;
         for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                long diff = menus.get(j) - menus.get(i);
-                ans = (ans + diff * pow(j - i - 1) % MOD)%MOD;
-            }
+            ans += menus.get(i) * pow(i);
+            ans -= menus.get(i) * pow(n - 1 - i);
+            ans %= MOD;
         }
         System.out.println(ans);
     }
