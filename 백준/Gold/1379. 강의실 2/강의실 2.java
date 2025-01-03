@@ -8,22 +8,6 @@ import java.util.StringTokenizer;
 public class Main {
     private static final boolean DEBUG_MODE = false;
 
-    //    5
-//            2
-//            5
-//            1
-//            2
-//            4
-//            5
-//            1
-//            3
-    // 3 1
-    // 1 2
-    // 8 3
-    // 5 4
-    // 2 5
-    // 4 2
-    // 6
     public static void main(String[] args) throws IOException {
         BufferedReader br;
         if (DEBUG_MODE) {
@@ -39,10 +23,6 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             schedule.add(new Lecture(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken())));
         }
-//        for (Lecture lecture : schedule) {
-//            System.out.println(lecture);
-//        }
-
         PriorityQueue<Classroom> classrooms = new PriorityQueue<>();
 
         int ans[] = new int[n + 1];
@@ -99,10 +79,6 @@ public class Main {
             this.en = en;
         }
 
-        public int getIdx() {
-            return idx;
-        }
-
         public int getSt() {
             return st;
         }
@@ -112,19 +88,8 @@ public class Main {
         }
 
         @Override
-        public String toString() {
-            return "Lecture{" +
-                    "idx=" + idx +
-                    ", st=" + st +
-                    ", en=" + en +
-                    '}';
-        }
-
-        @Override
         public int compareTo(Lecture o) {
             return Integer.compare(this.st, o.getSt());
         }
-
     }
-
 }
