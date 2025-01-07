@@ -18,89 +18,97 @@ public class Main {
         StringTokenizer st = new StringTokenizer(br.readLine());
         int v = Integer.parseInt(st.nextToken());
         int e = Integer.parseInt(st.nextToken());
-        int[][] conditions = new int[e][2];
+        int[][] graph = new int[e][2];
         for (int i = 0; i < e; i++) {
             st = new StringTokenizer(br.readLine());
-            conditions[i] = new int[]{Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken())};
+            graph[i] = new int[]{Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken())};
         }
-        Kosariju kosariju = new Kosariju(v, conditions);
+        Kosariju kosariju = new Kosariju(v, e, graph);
         kosariju.solve();
     }
 
-    static class Kosariju {
-        private final int n;
-        private final Map<Integer, List<Integer>> rel;
-        private final Map<Integer, List<Integer>> revRel;
-        private Stack<Integer> path;
+    /**
+     * 코사라주 알고리즘
+     * 1. 전체 정점에 대해 DFS 수행, 탐색을 마친 순서 저장
+     * 2. 해당 순서의 역순으로(마지막으로 마친 순서대로) 역방향 DFS 수행
+     */
 
-        public Kosariju(int n, int[][] conditions) {
-            HashMap<Integer, List<Integer>> rel = new HashMap<>();
-            HashMap<Integer, List<Integer>> revRel = new HashMap<>();
-            for (int i = 1; i <= n; i++) {
-                rel.put(i, new ArrayList<>());
-                revRel.put(i, new ArrayList<>());
+    static class Kosariju {
+        private final int v;
+        private final int e;
+        private final Map<Integer, List<Integer>> forwardGraph;
+        private final Map<Integer, List<Integer>> reverseGraph;
+
+        public Kosariju(int v, int e, int[][] graph) {
+            this.v = v;
+            this.e = e;
+            Map<Integer, List<Integer>> forwardGraph = new HashMap<>();
+            Map<Integer, List<Integer>> reverseGraph = new HashMap<>();
+            for (int i = 1; i <= v; i++) {
+                forwardGraph.put(i, new ArrayList<>());
+                reverseGraph.put(i, new ArrayList<>());
             }
-            for (int[] condition : conditions) {
-                rel.get(condition[0]).add(condition[1]);
-                revRel.get(condition[1]).add(condition[0]);
+            for (int[] edge : graph) {
+                forwardGraph.get(edge[0]).add(edge[1]);
+                reverseGraph.get(edge[1]).add(edge[0]);
             }
-            this.n = n;
-            this.rel = rel;
-            this.revRel = revRel;
-            this.path = new Stack<>();
+            this.forwardGraph = forwardGraph;
+            this.reverseGraph = reverseGraph;
         }
-        
+
         public void solve() {
-            boolean[] visit = new boolean[n + 1];
-            for (int i = 1; i <= n; i++) {
+            boolean[] visit = new boolean[v + 1];
+            List<Integer> forwardPathOrderBySearchEnd = new ArrayList<>();
+            for (int i = 1; i <= v; i++) {
                 if (!visit[i]) {
                     visit[i] = true;
-                    dfs(i, visit);
+                    dfs(i, visit, forwardPathOrderBySearchEnd);
                 }
             }
 
-            visit = new boolean[n + 1];
-            List<List<Integer>> ans = new ArrayList<>();
-            while (!path.isEmpty()) {
-                int st = path.pop();
+            visit = new boolean[v + 1];
+            List<List<Integer>> sccGroups = new ArrayList<>();
+            List<Integer> sccPath;
+            int st;
+            for (int i = forwardPathOrderBySearchEnd.size() - 1; i > -1; i--) {
+                st = forwardPathOrderBySearchEnd.get(i);
                 if (!visit[st]) {
                     visit[st] = true;
-                    List<Integer> footprint = new ArrayList<>();
-                    revDfs(st, visit, footprint);
-                    ans.add(footprint);
+                    sccPath = new ArrayList<>();
+                    reverseDfs(st, visit, sccPath);
+                    sccGroups.add(sccPath);
                 }
             }
+            for (List<Integer> sccGroup : sccGroups) {
+                sccGroup.sort(Comparator.naturalOrder());
+            }
+            sccGroups.sort(Comparator.comparingInt(it -> it.get(0)));
 
-            ans.forEach(it -> it.sort(Comparator.naturalOrder()));
-            ans.sort(Comparator.comparingInt(it -> it.get(0)));
-            System.out.println(ans.size());
-
-            for (List<Integer> an : ans) {
-                an.add(-1);
-                System.out.println(an.stream().map(String::valueOf).collect(Collectors.joining(" ")));
+            System.out.println(sccGroups.size());
+            for (List<Integer> sccGroup : sccGroups) {
+                sccGroup.add(-1);
+                System.out.println(sccGroup.stream().map(String::valueOf).collect(Collectors.joining(" ")));
             }
         }
 
-        private void dfs(int u, boolean[] visit) {
-            for (int v : rel.get(u)) {
+        private void dfs(int u, boolean[] visit, List<Integer> footprint) {
+            for (int v : forwardGraph.get(u)) {
                 if (!visit[v]) {
                     visit[v] = true;
-                    dfs(v, visit);
+                    dfs(v, visit, footprint);
                 }
             }
-            path.add(u);
-        }
-
-        private void revDfs(int u, boolean[] visit, List<Integer> footprint) {
             footprint.add(u);
-            for (int v : revRel.get(u)) {
+        }
+
+        private void reverseDfs(int u, boolean[] visit, List<Integer> footprint) {
+            footprint.add(u);
+            for (int v : reverseGraph.get(u)) {
                 if (!visit[v]) {
                     visit[v] = true;
-                    revDfs(v, visit, footprint);
+                    reverseDfs(v, visit, footprint);
                 }
             }
         }
-
-
     }
 }
