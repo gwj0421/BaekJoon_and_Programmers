@@ -20,45 +20,37 @@ public class Main {
         int b = Integer.parseInt(st.nextToken());
         int n = Integer.parseInt(st.nextToken());
 
-        boolean[] prime = initPrime();
-        int[] sosu = new int[n];
-        sosu[0] = a / 10;
-        sosu[1] = a % 10;
-        sosu[n - 2] = b / 10;
-        sosu[n - 1] = b % 10;
-        for (int i = 2; i < n - 2; i++) {
-            boolean flag = false;
-            for (int j = 1; j < 10; j++) {
-                if (checkPrime(sosu[i - 1], j, prime)) {
-                    sosu[i] = j;
-                    flag = true;
-                    break;
-                }
-            }
-            if (!flag) {
-                System.out.println(-1);
-                return;
-            }
-        }
-        if (!checkPrime(sosu[n - 3], sosu[n - 2], prime)) {
-            System.out.println(-1);
-            return;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i : sosu) {
-            sb.append(i);
-        }
-        System.out.println(sb.toString());
+        Algorithm algorithm = new Algorithm(a, b, n);
+        algorithm.printResult();
     }
 
-    public static boolean[] initPrime() {
-        boolean[] prime = new boolean[101];
+}
+
+class Algorithm {
+    private static final int MAX_NUM = 100;
+    private final int a;
+    private final int b;
+    private final int n;
+    private final boolean[] prime;
+    private int[] numbers;
+
+    public Algorithm(int a, int b, int n) {
+        this.a = a;
+        this.b = b;
+        this.n = n;
+        this.prime = initPrime();
+        this.numbers = initNumbers(a, b);
+    }
+
+
+    private boolean[] initPrime() {
+        boolean[] prime = new boolean[MAX_NUM + 1];
         Arrays.fill(prime, true);
         prime[0] = false;
         prime[1] = false;
-        for (int i = 2; (i * i) < 101; i++) {
+        for (int i = 2; (i * i) <= MAX_NUM; i++) {
             if (prime[i]) {
-                for (int j = i * i; j < 101; j += i) {
+                for (int j = i * i; j <= MAX_NUM; j += i) {
                     prime[j] = false;
                 }
             }
@@ -66,7 +58,49 @@ public class Main {
         return prime;
     }
 
-    public static boolean checkPrime(int num1, int num2, boolean[] prime) {
+    private int[] initNumbers(int a, int b) {
+        int[] numbers = new int[n];
+        numbers[0] = a / 10;
+        numbers[1] = a % 10;
+        numbers[n - 2] = b / 10;
+        numbers[n - 1] = b % 10;
+        return numbers;
+    }
+
+    public void printResult() {
+        if (makeSosusosu()) {
+            StringBuilder sb = new StringBuilder();
+            for (int number : numbers) {
+                sb.append(number);
+            }
+            System.out.println(sb);
+            return;
+        }
+        System.out.println(-1);
+    }
+
+    private boolean makeSosusosu() {
+        for (int i = 2; i < n - 2; i++) {
+            if (!searchPrime(i - 1, i)) {
+                return false;
+            }
+        }
+
+        return checkPrime(numbers[n - 3], numbers[n - 2]);
+    }
+
+    private boolean searchPrime(int beforeIdx, int nowIdx) {
+        for (int i = 1; i < 10; i++) {
+            if (checkPrime(numbers[beforeIdx], i)) {
+                numbers[nowIdx] = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkPrime(int num1, int num2) {
         return prime[num1 * 10 + num2];
     }
+
 }
