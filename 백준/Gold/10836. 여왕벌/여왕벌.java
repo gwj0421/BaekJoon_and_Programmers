@@ -25,18 +25,29 @@ class Main {
         for (int i = 0; i < m; i++) {
             Arrays.fill(ans[i], 1);
         }
+        // 3 3 4 5
+        // 3 1 1 1
+        // 2 1 1 1
+        // 2 1 1 1
 
+        // (1,0) 1 => y>=1&&x>=1 1
+        // (2,0) 1 => y>=2&&x>=1 1
+        // (0,1) 1 => y>=1&&x>=1 1
+        // (0,2) 1 => y>=1&&x>=2 1
+
+        // (2,0) 2 => y>=2&&x>=1 2
+        // (a,b) c => y>=a&&x>=b
+
+        // 왼쪽 열 2 => 해당 열 이하는 다 +2
+        // 0,0 =>
         int[] growRates;
-        int[][] grow;
         int gy, gx;
         for (int i = 0; i < n; i++) {
             growRates = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
-            grow = new int[m][m];
             gy = m - 1;
             gx = 0;
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < growRates[j]; k++) {
-                    grow[gy][gx] = j;
                     ans[gy][gx] += j;
                     if (gy == 0) {
                         gx++;
@@ -45,11 +56,10 @@ class Main {
                     }
                 }
             }
+        }
+        for (int i = 1; i < m; i++) {
             for (int j = 1; j < m; j++) {
-                for (int k = 1; k < m; k++) {
-                    grow[j][k] = Math.max(grow[j][k - 1], Math.max(grow[j - 1][k - 1], grow[j - 1][k]));
-                    ans[j][k] += grow[j][k];
-                }
+                ans[i][j] = Math.max(ans[i][j - 1], Math.max(ans[i - 1][j - 1], ans[i - 1][j]));
             }
         }
 
